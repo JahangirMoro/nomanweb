@@ -9,3 +9,4 @@ python-multipart
 pypdf
 sentence_transformers
 huggingface_hub
+gunicorn
