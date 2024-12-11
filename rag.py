@@ -5,11 +5,11 @@ from fastapi.templating import Jinja2Templates
 from langchain.chains import RetrievalQA
 from langchain.llms import CTransformers
 from langchain_community.embeddings import SentenceTransformerEmbeddings
-
 from langchain.vectorstores import FAISS
 from langchain import PromptTemplate
 from langchain_community.llms import Ollama
 import time  # Import time module for measuring response time
+import webbrowser  # Import webbrowser to open in browser automatically
 
 # Initialize FastAPI application
 app = FastAPI()
@@ -57,25 +57,16 @@ async def contact(request: Request):
     """
     return templates.TemplateResponse("contact.html", {"request": request})
 
-
-@app.get("/elements/", response_class=HTMLResponse, name="contact")
-async def contact(request: Request):
+@app.get("/elements/", response_class=HTMLResponse, name="elements")
+async def elements(request: Request):
     """
-    Render the contact page.
-    """
-    return templates.TemplateResponse("elements.html", {"request": request})
-
-@app.get("/elements/", response_class=HTMLResponse, name="contact")
-async def contact(request: Request):
-    """
-    Render the contact page.
+    Render the elements page.
     """
     return templates.TemplateResponse("elements.html", {"request": request})
 
 # ---------- Chatbot Initialization (Backend) ---------- #
 
 # Initialize Local LLM Model
-#local_llm = Ollama(model="qwen:0.5b")
 local_llm = Ollama(model="llama3.2")
 
 # Initialize embeddings model using SentenceTransformer
@@ -96,7 +87,7 @@ Question: {question}
 
 Helpful answer:
 """
-prompt = PromptTemplate(template=prompt_template, input_variables=['context', 'question'])
+prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
 
 # ---------- Chatbot API Endpoint ---------- #
 
@@ -121,15 +112,23 @@ async def get_response(query: str = Form(...)):
         chain_type="stuff",
         retriever=retriever,
         return_source_documents=True,
-        chain_type_kwargs=chain_type_kwargs
+        chain_type_kwargs=chain_type_kwargs,
     )
 
     # Generate response from the query
     try:
         response = qa(query)
-        answer = response.get('result', "No answer found.")
-        source_document = response['source_documents'][0].page_content if response['source_documents'] else "No context found."
-        doc = response['source_documents'][0].metadata.get('source', "Unknown source.") if response['source_documents'] else "Unknown source."
+        answer = response.get("result", "No answer found.")
+        source_document = (
+            response["source_documents"][0].page_content
+            if response["source_documents"]
+            else "No context found."
+        )
+        doc = (
+            response["source_documents"][0].metadata.get("source", "Unknown source.")
+            if response["source_documents"]
+            else "Unknown source."
+        )
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
@@ -142,7 +141,18 @@ async def get_response(query: str = Form(...)):
         "answer": answer,
         "source_document": source_document,
         "doc": doc,
-        "response_time": response_time
+        "response_time": response_time,
     }
 
     return JSONResponse(content=response_data)
+
+# ---------- Script to Run Without Command and Open Browser ---------- #
+
+if __name__ == "__main__":
+    import uvicorn
+    
+
+    
+
+    # Start the server
+    uvicorn.run("rag:app", host="127.0.0.1", port=8000, reload=True)
