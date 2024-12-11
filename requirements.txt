@@ -6,6 +6,6 @@ sentence_transformers
 ctransformers
 langchain_community
 python-multipart
-install pypdf
+pypdf
 sentence_transformers
 huggingface_hub
