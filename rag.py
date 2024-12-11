@@ -8,8 +8,8 @@ from langchain_community.embeddings import SentenceTransformerEmbeddings
 from langchain.vectorstores import FAISS
 from langchain import PromptTemplate
 from langchain_community.llms import Ollama
-import time  # Import time module for measuring response time
-import webbrowser  # Import webbrowser to open in browser automatically
+import os
+import time  # For measuring response time
 
 # Initialize FastAPI application
 app = FastAPI()
@@ -150,9 +150,9 @@ async def get_response(query: str = Form(...)):
 
 if __name__ == "__main__":
     import uvicorn
-    
 
-    
+    # Get port from environment variable
+    PORT = int(os.environ.get("PORT", 8000))
 
     # Start the server
-    uvicorn.run("rag:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("rag:app", host="0.0.0.0", port=PORT, reload=True)
