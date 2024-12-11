@@ -1,0 +1,11 @@
+langchain
+fastapi
+jinja2
+faiss-cpu
+sentence_transformers
+ctransformers
+langchain_community
+python-multipart
+pip install pypdf
+sentence_transformers
+huggingface_hub

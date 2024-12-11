@@ -1,0 +1,37 @@
+/* Specific Styling for Cards Only */
+.intro-wrap .card {
+    opacity: 0.8; /* Default dim effect */
+    transition: all 0.3s ease-in-out;
+}
+
+.intro-wrap .card:hover {
+    opacity: 1; /* Full visibility on hover */
+    transform: scale(1.03); /* Slight zoom effect */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Highlight shadow */
+}
+
+/* Specific Styling for Button */
+.intro-wrap .btn-custom {
+    background: linear-gradient(90deg, #28a745, #218838);
+    color: white;
+    padding: 15px 30px;
+    font-size: 18px;
+    border-radius: 8px;
+    font-weight: bold;
+    opacity: 0.8; /* Dim effect */
+    transition: all 0.3s ease-in-out;
+}
+
+.intro-wrap .btn-custom:hover {
+    opacity: 1; /* Full visibility on hover */
+    background: linear-gradient(90deg, #218838, #1e7e34);
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2); /* Button highlight */
+    transform: translateY(-2px); /* Lift effect */
+}
+
+/* Ensuring Images Are Not Affected */
+.slides img {
+    opacity: 1; /* Always fully visible */
+    transform: none; /* No transformation effect */
+    transition: none; /* No transition effect */
+}

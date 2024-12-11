@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Widget</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        .chatbot-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+        .chatbot-window {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 350px;
+            max-height: 70%;
+            background-color: #ffffff;
+            border-radius: 10px;
+            display: none;
+            flex-direction: column;
+            z-index: 999;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .chatbot-header {
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .chatbot-messages {
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+            flex-grow: 1;
+            max-height: 80%;
+            border-bottom: 1px solid #ddd;
+        }
+        .chatbot-input-area {
+            display: flex;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 0 0 10px 10px;
+        }
+        .chatbot-input {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+        .chatbot-send-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .user-message, .bot-message {
+            margin-bottom: 15px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        .user-message {
+            text-align: right;
+            color: #333;
+            background-color: #d1f7ff;
+            padding: 8px;
+            border-radius: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .bot-message {
+            text-align: left;
+            color: #333;
+            background-color: #f7f7f7;
+            padding: 8px;
+            border-radius: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Chatbot Button -->
+    <button class="chatbot-btn" id="chatbotBtn">💬</button>
+
+    <!-- Chatbot Window -->
+    <div class="chatbot-window" id="chatbotWindow">
+        <div class="chatbot-header" id="chatbotHeader">
+            Chat with us! <button class="btn-close btn-close-white" id="closeChatbot"></button>
+        </div>
+        <div class="chatbot-messages" id="chatMessages"></div>
+        <div class="chatbot-input-area">
+            <input type="text" id="userInput" class="form-control chatbot-input" placeholder="Type your message...">
+            <button id="sendBtn" class="btn chatbot-send-btn">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // Open Chatbot Window
+        document.getElementById('chatbotBtn').addEventListener('click', function() {
+            document.getElementById('chatbotWindow').style.display = 'flex';
+            this.style.display = 'none';
+        });
+
+        // Close Chatbot Window when header or close button is clicked
+        document.getElementById('chatbotHeader').addEventListener('click', function() {
+            document.getElementById('chatbotWindow').style.display = 'none';
+            document.getElementById('chatbotBtn').style.display = 'block';
+        });
+
+        document.getElementById('closeChatbot').addEventListener('click', function() {
+            document.getElementById('chatbotWindow').style.display = 'none';
+            document.getElementById('chatbotBtn').style.display = 'block';
+        });
+
+        // Send Message When Button is Clicked
+        document.getElementById('sendBtn').addEventListener('click', function() {
+            const userInput = document.getElementById('userInput').value;
+            if (userInput.trim()) {
+                appendMessage(userInput, 'user');
+                fetchResponse(userInput);
+                document.getElementById('userInput').value = '';
+            }
+        });
+
+        // Send Message on Enter Key Press
+        document.getElementById('userInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                const userInput = this.value;
+                if (userInput.trim()) {
+                    appendMessage(userInput, 'user');
+                    fetchResponse(userInput);
+                    this.value = '';
+                }
+            }
+        });
+
+        // Append User or Bot Message to the Chat
+        function appendMessage(message, sender) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `${sender}-message`;
+            messageDiv.textContent = message;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Fetch Response (You can replace this with your backend call or API)
+        async function fetchResponse(userInput) {
+            try {
+                const response = await fetch('/get_response', {
+                    method: 'POST',
+                    body: new URLSearchParams({ query: userInput }),
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                });
+                const data = await response.json();
+                appendMessage(data.answer, 'bot');
+            } catch (error) {
+                appendMessage('Error fetching response.', 'bot');
+            }
+        }
+    </script>
+
+</body>
+</html>
