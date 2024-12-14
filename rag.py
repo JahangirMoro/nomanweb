@@ -3,13 +3,11 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from langchain.chains import RetrievalQA
-from langchain.llms import CTransformers
 from langchain_community.embeddings import SentenceTransformerEmbeddings
 from langchain.vectorstores import FAISS
 from langchain import PromptTemplate
-from langchain_community.llms import Ollama
 import os
-import time  # For measuring response time
+import time
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer
 from langchain.llms import HuggingFaceLLM
 
@@ -18,7 +16,8 @@ model_name = "distilbert-base-uncased-distilled-squad"
 model = AutoModelForQuestionAnswering.from_pretrained(model_name)
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-
+# Initialize Hugging Face with the transformers model
+hf_llm = HuggingFaceLLM(model=model, tokenizer=tokenizer)
 
 # Initialize FastAPI application
 app = FastAPI()
@@ -75,9 +74,6 @@ async def elements(request: Request):
 
 # ---------- Chatbot Initialization (Backend) ---------- #
 
-# Initialize Local LLM Model
-local_llm =  HuggingFaceLLM(model=model, tokenizer=tokenizer)
-
 # Initialize embeddings model using SentenceTransformer
 embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
 
@@ -117,7 +113,7 @@ async def get_response(query: str = Form(...)):
 
     # Create a RetrievalQA pipeline with the specified prompt
     qa = RetrievalQA.from_chain_type(
-        llm=local_llm,
+        llm=hf_llm,  # Updated to use HuggingFaceLLM
         chain_type="stuff",
         retriever=retriever,
         return_source_documents=True,
