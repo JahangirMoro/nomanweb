@@ -76,7 +76,7 @@ async def elements(request: Request):
 # ---------- Chatbot Initialization (Backend) ---------- #
 
 # Initialize Local LLM Model
-local_llm =  HuggingFaceLLM(model=model, tokenizer=tokenizer
+local_llm =  HuggingFaceLLM(model=model, tokenizer=tokenizer)
 
 # Initialize embeddings model using SentenceTransformer
 embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
