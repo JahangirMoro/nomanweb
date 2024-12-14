@@ -10,6 +10,15 @@ from langchain import PromptTemplate
 from langchain_community.llms import Ollama
 import os
 import time  # For measuring response time
+from transformers import AutoModelForQuestionAnswering, AutoTokenizer
+from langchain.llms import HuggingFaceLLM
+
+# Initialize Hugging Face model
+model_name = "distilbert-base-uncased-distilled-squad"
+model = AutoModelForQuestionAnswering.from_pretrained(model_name)
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+
 
 # Initialize FastAPI application
 app = FastAPI()
@@ -67,7 +76,7 @@ async def elements(request: Request):
 # ---------- Chatbot Initialization (Backend) ---------- #
 
 # Initialize Local LLM Model
-local_llm = Ollama(model="llama3.2")
+local_llm =  HuggingFaceLLM(model=model, tokenizer=tokenizer
 
 # Initialize embeddings model using SentenceTransformer
 embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
