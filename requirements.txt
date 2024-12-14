@@ -2,7 +2,6 @@ langchain
 fastapi
 jinja2
 faiss-cpu
-sentence_transformers
 ctransformers
 langchain_community
 python-multipart
@@ -12,3 +11,6 @@ huggingface_hub
 gunicorn
 uvicorn
 ollama
+transformers 
+accelerate
+python-dotenv 
