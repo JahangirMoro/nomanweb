@@ -37,7 +37,7 @@ async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/services/", response_class=HTMLResponse, name="services")
-async def services(request: Request):
+async def SDP(request: Request):
     """
     Render the services page.
     """
